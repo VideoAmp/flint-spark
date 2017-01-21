@@ -30,3 +30,38 @@ RUN sed -i 's/nohup --/nohup/' /opt/spark/sbin/spark-daemon.sh
 
 COPY boot/boot-master.sh /usr/local/sbin/boot-master.sh
 COPY boot/boot-worker.sh /usr/local/sbin/boot-worker.sh
+
+ARG SPARK_BINARY_VERSION
+ARG NATIVE_LIB_VERSION
+
+# AWS cli is needed for refresh_na_26_db.sh script
+RUN wget https://s3.amazonaws.com/aws-cli/awscli-bundle.zip
+RUN unzip awscli-bundle.zip
+RUN ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+RUN rm -rf awscli-bundle*
+
+RUN wget -O /tmp/yjp.tgz https://s3.amazonaws.com/vamp-artifacts/yourkit/yjp-2016.02-b43-linux-min.tgz
+RUN tar xzf /tmp/yjp.tgz -C /opt
+RUN cd /opt && ln -s yjp-2016.02 yjp
+RUN rm /tmp/yjp.tgz
+
+RUN mkdir -p /opt/geo
+COPY bin/refresh_na_26_db.sh /usr/local/bin/refresh_na_26_db.sh
+
+RUN wget -O /tmp/hadoop-conf.zip http://prod-cdh-cm-01.prod.use1:7180/api/v11/clusters/Cluster%201/services/hive/clientConfig
+RUN unzip -d /tmp /tmp/hadoop-conf.zip
+RUN cp /tmp/hive-conf/core-site.xml /opt/spark/conf
+RUN cp /tmp/hive-conf/hdfs-site.xml /opt/spark/conf
+RUN cp /tmp/hive-conf/hive-site.xml /opt/spark/conf
+
+RUN mkdir -p /opt/spark/lib
+RUN wget -O - https://s3.amazonaws.com/vamp-static/public/spark-native-libs/$NATIVE_LIB_VERSION/hadoop-libs.gz | tar xzf - -C /opt/spark/lib
+
+RUN apk add jq lighttpd
+
+RUN find /opt/spark/jars -name '*.jar' -exec sha256sum {} \; | jq --raw-input 'split("  /opt/spark/jars/") | {name: .[1], signature: .[0]}' | jq --slurp . > /opt/spark/jars/MANIFEST.json
+RUN echo 'server.port = 8088' >> /etc/lighttpd/lighttpd.conf
+RUN echo 'dir-listing.activate = "enable"' >> /etc/lighttpd/lighttpd.conf
+COPY setup/$SPARK_BINARY_VERSION /var/www/localhost/htdocs/setup/flint
+RUN ln -s /opt/spark/jars /var/www/localhost/htdocs/jars
+RUN ln -s /opt/spark/conf /var/www/localhost/htdocs/conf
