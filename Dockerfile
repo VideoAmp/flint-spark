@@ -62,6 +62,7 @@ RUN apk add jq lighttpd
 RUN find /opt/spark/jars -name '*.jar' -exec sha256sum {} \; | jq --raw-input 'split("  /opt/spark/jars/") | {name: .[1], signature: .[0]}' | jq --slurp . > /opt/spark/jars/MANIFEST.json
 RUN echo 'server.port = 8088' >> /etc/lighttpd/lighttpd.conf
 RUN echo 'dir-listing.activate = "enable"' >> /etc/lighttpd/lighttpd.conf
+COPY bootstrap/bootstrap.sc /var/www/localhost/htdocs
 COPY setup/$SPARK_BINARY_VERSION /var/www/localhost/htdocs/setup/flint
 RUN ln -s /opt/spark/jars /var/www/localhost/htdocs/jars
 RUN ln -s /opt/spark/conf /var/www/localhost/htdocs/conf
