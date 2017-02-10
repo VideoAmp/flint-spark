@@ -48,7 +48,7 @@ RUN rm /tmp/yjp.tgz
 RUN mkdir -p /opt/geo
 COPY bin/refresh_na_26_db.sh /usr/local/bin/refresh_na_26_db.sh
 
-RUN wget -O /tmp/hadoop-conf.zip http://prod-cdh-cm-01.prod.use1:7180/api/v11/clusters/Cluster%201/services/hive/clientConfig
+RUN wget -O /tmp/hadoop-conf.zip http://prod-cdh-cm-01.prod.use1:7180/api/v11/clusters/Production%20US-EAST-1/services/hive/clientConfig
 RUN unzip -d /tmp /tmp/hadoop-conf.zip
 RUN cp /tmp/hive-conf/core-site.xml /opt/spark/conf
 RUN cp /tmp/hive-conf/hdfs-site.xml /opt/spark/conf
