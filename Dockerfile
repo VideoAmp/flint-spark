@@ -40,9 +40,9 @@ RUN unzip awscli-bundle.zip
 RUN ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
 RUN rm -rf awscli-bundle*
 
-RUN wget -O /tmp/yjp.tgz https://s3.amazonaws.com/vamp-artifacts/yourkit/yjp-2016.02-b43-linux-min.tgz
+RUN wget -O /tmp/yjp.tgz https://s3.amazonaws.com/vamp-artifacts/yourkit/yjp-2017.02-b50-linux-min.tgz
 RUN tar xzf /tmp/yjp.tgz -C /opt
-RUN cd /opt && ln -s yjp-2016.02 yjp
+RUN cd /opt && ln -s yjp-2017.02 yjp
 RUN rm /tmp/yjp.tgz
 
 RUN mkdir -p /opt/geo
