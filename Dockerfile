@@ -1,4 +1,4 @@
-FROM videoamp/alpine-java:8_jdk_unlimited
+FROM videoamp/alpine-java:8_jdk_unlimited-0e64708
 
 ARG DISTFILE
 
