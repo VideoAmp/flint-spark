@@ -1,9 +1,9 @@
-FROM videoamp/alpine-java:8_jdk_unlimited-0e64708
+FROM alpine:3.5
 
 ARG DISTFILE
 
 RUN apk update
-RUN apk add ca-certificates procps python wget jemalloc
+RUN apk add bash ca-certificates jemalloc openjdk8 procps python wget
 
 ENV R_PKG_RELEASE="3.3.1-r0"
 
@@ -51,21 +51,21 @@ RUN rm /tmp/yjp.tgz
 RUN mkdir -p /opt/geo
 COPY bin/refresh_na_26_db.sh /usr/local/bin/refresh_na_26_db.sh
 
-RUN wget -O /tmp/hadoop-conf.zip http://prod-cdh-cm-01.prod.use1:7180/api/v11/clusters/Production%20US-EAST-1/services/hive/clientConfig
-RUN unzip -d /tmp /tmp/hadoop-conf.zip
-RUN cp /tmp/hive-conf/core-site.xml /opt/spark/conf
-RUN cp /tmp/hive-conf/hdfs-site.xml /opt/spark/conf
-RUN cp /tmp/hive-conf/hive-site.xml /opt/spark/conf
-
-RUN mkdir -p /opt/spark/lib
-RUN wget -O - https://s3.amazonaws.com/vamp-static/public/spark-native-libs/$NATIVE_LIB_VERSION/hadoop-libs.gz | tar xzf - -C /opt/spark/lib
-
-RUN apk add jq lighttpd
-
-RUN find /opt/spark/jars -name '*.jar' -exec sha256sum {} \; | jq --raw-input 'split("  /opt/spark/jars/") | {name: .[1], signature: .[0]}' | jq --slurp . > /opt/spark/jars/MANIFEST.json
-RUN echo 'server.port = 8088' >> /etc/lighttpd/lighttpd.conf
-RUN echo 'dir-listing.activate = "enable"' >> /etc/lighttpd/lighttpd.conf
-COPY bootstrap/bootstrap.sc /var/www/localhost/htdocs
-COPY setup/$SPARK_BINARY_VERSION /var/www/localhost/htdocs/setup/flint
-RUN ln -s /opt/spark/jars /var/www/localhost/htdocs/jars
-RUN ln -s /opt/spark/conf /var/www/localhost/htdocs/conf
+# RUN wget -O /tmp/hadoop-conf.zip http://prod-cdh-cm-01.prod.use1:7180/api/v11/clusters/Production%20US-EAST-1/services/hive/clientConfig
+# RUN unzip -d /tmp /tmp/hadoop-conf.zip
+# RUN cp /tmp/hive-conf/core-site.xml /opt/spark/conf
+# RUN cp /tmp/hive-conf/hdfs-site.xml /opt/spark/conf
+# RUN cp /tmp/hive-conf/hive-site.xml /opt/spark/conf
+#
+# RUN mkdir -p /opt/spark/lib
+# RUN wget -O - https://s3.amazonaws.com/vamp-static/public/spark-native-libs/$NATIVE_LIB_VERSION/hadoop-libs.gz | tar xzf - -C /opt/spark/lib
+#
+# RUN apk add jq lighttpd
+#
+# RUN find /opt/spark/jars -name '*.jar' -exec sha256sum {} \; | jq --raw-input 'split("  /opt/spark/jars/") | {name: .[1], signature: .[0]}' | jq --slurp . > /opt/spark/jars/MANIFEST.json
+# RUN echo 'server.port = 8088' >> /etc/lighttpd/lighttpd.conf
+# RUN echo 'dir-listing.activate = "enable"' >> /etc/lighttpd/lighttpd.conf
+# COPY bootstrap/bootstrap.sc /var/www/localhost/htdocs
+# COPY setup/$SPARK_BINARY_VERSION /var/www/localhost/htdocs/setup/flint
+# RUN ln -s /opt/spark/jars /var/www/localhost/htdocs/jars
+# RUN ln -s /opt/spark/conf /var/www/localhost/htdocs/conf
