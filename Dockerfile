@@ -30,3 +30,12 @@ RUN sed -i 's/nohup --/nohup/' /opt/spark/sbin/spark-daemon.sh
 
 COPY boot/boot-master.sh /usr/local/sbin/boot-master.sh
 COPY boot/boot-worker.sh /usr/local/sbin/boot-worker.sh
+
+RUN apk add jq lighttpd
+
+RUN find /opt/spark/jars -name '*.jar' -exec sha256sum {} \; | jq --raw-input 'split("  /opt/spark/jars/") | {name: .[1], signature: .[0]}' | jq --slurp . > /opt/spark/jars/MANIFEST.json
+RUN echo 'server.port = 8088' >> /etc/lighttpd/lighttpd.conf
+RUN echo 'dir-listing.activate = "enable"' >> /etc/lighttpd/lighttpd.conf
+COPY bootstrap/bootstrap.sc /var/www/localhost/htdocs
+RUN ln -s /opt/spark/jars /var/www/localhost/htdocs/jars
+RUN ln -s /opt/spark/conf /var/www/localhost/htdocs/conf
