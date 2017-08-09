@@ -4,6 +4,7 @@ set -e
 set -u
 
 function usage() {
+  echo "Build a Spark Docker image for Flint"
   echo "Usage: $(basename $0) [-y] <spark-distfile> <image-repo-name> <image-number>"
   echo "  -y  Build image without prompting for confirmation"
   exit 1
