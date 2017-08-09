@@ -14,6 +14,11 @@ if [ $# -ne 3 ] && [ $# -ne 4 ]; then
   usage
 fi
 
+if [ ! -f Dockerfile ]; then
+  echo "Dockerfile not found. Use Dockerfile-base as a starting point to create one."
+  exit 1
+fi
+
 if [ $1 = "-y" ]; then
   PROMPT=false
   shift
