@@ -84,4 +84,4 @@ mv $DISTFILE $DISTDIR
 
 cd $BASEDIR
 
-docker build --squash --no-cache --build-arg DISTFILE=dist/$(basename $DISTFILE) -t $IMAGE_NAME .
+docker build --no-cache --build-arg DISTFILE=dist/$(basename $DISTFILE) -t $IMAGE_NAME .
