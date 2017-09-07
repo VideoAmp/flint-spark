@@ -2,6 +2,8 @@
 
 SPARK_COMMON_OPTS="-Dcom.sun.management.jmxremote.port=6000 -Dcom.sun.management.jmxremote.ssl=false"
 SPARK_COMMON_OPTS+=" -Dcom.sun.management.jmxremote.authenticate=false"
+SPARK_COMMON_OPTS+=" -Dspark.blockManager.port=7005 -Dspark.executor.port=7006"
+SPARK_COMMON_OPTS+=" -Dspark.broadcast.factory=org.apache.spark.broadcast.HttpBroadcastFactory"
 
 SPARK_MASTER_OPTS=$SPARK_COMMON_OPTS
 
